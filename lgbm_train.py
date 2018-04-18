@@ -9,7 +9,7 @@ import numpy as np
 from sklearn.cross_validation import train_test_split
 import lightgbm as lgb
 import gc
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import os
 
 debug = 0
@@ -322,7 +322,7 @@ def DO(frm, to, fileno):
 
     print('Plot feature importances...')
     ax = lgb.plot_importance(bst, max_num_features=100)
-    # plt.show()
+    plt.savefig("result.png")
 
     print("Predicting...")
     sub['is_attributed'] = bst.predict(test_df[predictors], num_iteration=best_iteration)
