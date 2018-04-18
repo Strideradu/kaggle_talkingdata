@@ -13,6 +13,21 @@ import matplotlib.pyplot as plt
 import os
 
 debug = 0
+
+nrows = 184903891 - 1
+nchunk = 40000000
+val_size = 2500000
+
+# frm = nrows - 75000000
+frm = 0
+nchunk = nrows - 1
+if debug:
+    frm = 0
+    nchunk = 100000
+    val_size = 10000
+
+to = frm + nchunk
+
 if debug:
     print('*** debug parameter set: this is a test run for debugging purposes ***')
 
@@ -87,16 +102,19 @@ def DO(frm, to, fileno):
     }
 
     print('loading train data...', frm, to)
-    train_df = pd.read_csv("/mnt/home/dunan/Learn/Kaggle/talkingdata_fraud/train.csv", parse_dates=['click_time'], skiprows=range(1, frm), nrows=to - frm,
+    train_df = pd.read_csv("/mnt/home/dunan/Learn/Kaggle/talkingdata_fraud/train.csv", parse_dates=['click_time'],
+                           skiprows=range(1, frm), nrows=to - frm,
                            dtype=dtypes,
                            usecols=['ip', 'app', 'device', 'os', 'channel', 'click_time', 'is_attributed'])
 
     print('loading test data...')
     if debug:
-        test_df = pd.read_csv("/mnt/home/dunan/Learn/Kaggle/talkingdata_fraud/test.csv", nrows=100000, parse_dates=['click_time'], dtype=dtypes,
+        test_df = pd.read_csv("/mnt/home/dunan/Learn/Kaggle/talkingdata_fraud/test.csv", nrows=100000,
+                              parse_dates=['click_time'], dtype=dtypes,
                               usecols=['ip', 'app', 'device', 'os', 'channel', 'click_time', 'click_id'])
     else:
-        test_df = pd.read_csv("/mnt/home/dunan/Learn/Kaggle/talkingdata_fraud/test.csv", parse_dates=['click_time'], dtype=dtypes,
+        test_df = pd.read_csv("/mnt/home/dunan/Learn/Kaggle/talkingdata_fraud/test.csv", parse_dates=['click_time'],
+                              dtype=dtypes,
                               usecols=['ip', 'app', 'device', 'os', 'channel', 'click_time', 'click_id'])
 
     len_train = len(train_df)
@@ -334,19 +352,4 @@ def DO(frm, to, fileno):
 
 
 if __name__ == '__main__':
-
-    nrows = 184903891 - 1
-    nchunk = 40000000
-    val_size = 2500000
-
-    #frm = nrows - 75000000
-    frm = 0
-    nchunk = nrows - 1
-    if debug:
-        frm = 0
-        nchunk = 100000
-        val_size = 10000
-
-    to = frm + nchunk
-
     sub = DO(frm, to, 0)
