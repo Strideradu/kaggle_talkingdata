@@ -9,6 +9,9 @@ import numpy as np
 from sklearn.cross_validation import train_test_split
 import lightgbm as lgb
 import gc
+import matplotlib
+
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import os
 
@@ -338,16 +341,17 @@ def DO(frm, to, fileno):
     del val_df
     gc.collect()
 
-    print('Plot feature importances...')
-    ax = lgb.plot_importance(bst, max_num_features=100)
-    plt.savefig("result.png")
-
     print("Predicting...")
     sub['is_attributed'] = bst.predict(test_df[predictors], num_iteration=best_iteration)
     if not debug:
         print("writing...")
         sub.to_csv('sub_it%d.csv.gz' % (fileno), index=False, compression='gzip')
     print("done...")
+
+    print('Plot feature importances...')
+    ax = lgb.plot_importance(bst, max_num_features=100)
+    plt.savefig("result.png")
+    
     return sub
 
 
