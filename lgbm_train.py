@@ -129,6 +129,7 @@ def DO(frm, to, fileno):
     print('Extracting new features...')
     train_df['hour'] = pd.to_datetime(train_df.click_time).dt.hour.astype('uint8')
     train_df['day'] = pd.to_datetime(train_df.click_time).dt.day.astype('uint8')
+    train_df['wday'] = pd.to_datetime(train_df.click_time)..dt.dayofweek.astype('uint8')
 
     gc.collect()
 
@@ -248,6 +249,69 @@ def DO(frm, to, fileno):
     del gp
     gc.collect()
 
+    # new fatures
+
+    most_freq_hours_in_test_data = [4, 5, 9, 10, 13, 14]
+    least_freq_hours_in_test_data = [6, 11, 15]
+
+    train_df['in_test_hh'] = (3
+                              - 2 * train_df['hour'].isin(most_freq_hours_in_test_data)
+                              - 1 * train_df['hour'].isin(least_freq_hours_in_test_data)).astype('uint8')
+
+    # unique count
+
+    print('grouping by ip-app combination...')
+    gp = train_df[['ip', 'wday', 'in_test_hh']].groupby(by=['ip', 'wday'])[['in_test_hh']].nunique().reset_index().rename(
+        index=str, columns={'in_test_hh': 'ip_wday_unique_in_test_hh'})
+    train_df = train_df.merge(gp, on=['ip', 'wday'], how='left')
+    del gp
+    gc.collect()
+
+    print('grouping by ip-app combination...')
+    gp = train_df[['ip', 'device', 'os', 'app']].groupby(by=['ip', 'device', 'os'])[
+        ['app']].nunique().reset_index().rename(
+        index=str, columns={'app': 'ip_device_os_unique_app'})
+    train_df = train_df.merge(gp, on=['ip', 'device', 'os'], how='left')
+    del gp
+    gc.collect()
+
+    print('grouping by ip-app combination...')
+    gp = train_df[['ip', 'device']].groupby(by=['ip'])[['device']].nunique().reset_index().rename(
+        index=str, columns={'device': 'ip_unique_device'})
+    train_df = train_df.merge(gp, on=['ip'], how='left')
+    del gp
+    gc.collect()
+
+    print('grouping by ip combination...')
+    gp = train_df[['ip', 'app']].groupby(by=['ip'])[['app']].nunique().reset_index().rename(
+        index=str, columns={'app': 'ip_unique_app'})
+    train_df = train_df.merge(gp, on=['ip'], how='left')
+    del gp
+    gc.collect()
+
+    print('grouping by ip-app combination...')
+    gp = train_df[['ip', 'app', 'os']].groupby(by=['ip', 'app'])[['os']].nunique().reset_index().rename(
+        index=str, columns={'os': 'ip_app_unique_os'})
+    train_df = train_df.merge(gp, on=['ip', 'app'], how='left')
+    del gp
+    gc.collect()
+
+    print('grouping by ip-app combination...')
+    gp = train_df[['ip', 'day', 'hour']].groupby(by=['ip', 'day'])[['hour']].nunique().reset_index().rename(
+        index=str, columns={'hour': 'ip_day_unique_hour'})
+    train_df = train_df.merge(gp, on=['ip', 'day'], how='left')
+    del gp
+    gc.collect()
+
+    print('grouping by ip-app combination...')
+    gp = train_df[['ip', 'wday', 'hour']].groupby(by=['ip', 'wday'])[['hour']].nunique().reset_index().rename(
+        index=str, columns={'hour': 'ip_wday_unique_hour'})
+    train_df = train_df.merge(gp, on=['ip', 'wday'], how='left')
+    del gp
+    gc.collect()
+
+    # channel groupby app
+
     # Adding features with var and mean hour (inspired from nuhsikander's script)
     print('grouping by : ip_day_chl_var_hour')
     gp = train_df[['ip', 'day', 'hour', 'channel']].groupby(by=['ip', 'day', 'channel'])[
@@ -278,6 +342,20 @@ def DO(frm, to, fileno):
     del gp
     gc.collect()
 
+    # cumcount feature
+
+    print('grouping by ip combination...')
+    gp = train_df[['ip', 'os']].groupby(by=['ip'])[['os']].cumcount()
+    train_df['ip_cum_os'] = gp.values
+    del gp
+    gc.collect()
+
+    print('grouping by ip combination...')
+    gp = train_df[['ip', 'device', 'os', 'app']].groupby(by=['ip', 'device', 'os'])[['app']].cumcount()
+    train_df['ip_device_os_cum_app'] = gp.values
+    del gp
+    gc.collect()
+
     print("vars and data type: ")
     train_df.info()
     train_df['ip_tcount'] = train_df['ip_tcount'].astype('uint16')
@@ -288,7 +366,11 @@ def DO(frm, to, fileno):
     predictors.extend(['app', 'device', 'os', 'channel', 'hour', 'day',
                        'ip_tcount', 'ip_tchan_count', 'ip_app_count',
                        'ip_app_os_count', 'ip_app_os_var',
-                       'ip_app_channel_var_day', 'ip_app_channel_mean_hour'])
+                       'ip_app_channel_var_day', 'ip_app_channel_mean_hour',
+                       'in_test_hh', 'ip_wday_unique_in_test_hh', 'ip_device_os_unique_app', 'ip_unique_device',
+                       'ip_unique_app', 'ip_app_unique_os', 'ip_day_unique_hour',
+                       'ip_cum_os', 'ip_device_os_cum_app', 'ip_wday_unique_hour'
+                       ])
     categorical = ['app', 'device', 'os', 'channel', 'hour', 'day']
     for i in range(0, naddfeat):
         predictors.append('X' + str(i))
