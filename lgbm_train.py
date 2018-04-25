@@ -129,7 +129,7 @@ def DO(frm, to, fileno):
     print('Extracting new features...')
     train_df['hour'] = pd.to_datetime(train_df.click_time).dt.hour.astype('uint8')
     train_df['day'] = pd.to_datetime(train_df.click_time).dt.day.astype('uint8')
-    train_df['wday'] = pd.to_datetime(train_df.click_time)..dt.dayofweek.astype('uint8')
+    train_df['wday'] = pd.to_datetime(train_df.click_time).dt.dayofweek.astype('uint8')
 
     gc.collect()
 
