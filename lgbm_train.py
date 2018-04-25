@@ -260,14 +260,14 @@ def DO(frm, to, fileno):
 
     # unique count
 
-    print('grouping by ip-app combination...')
+    print('grouping by ip-wday combination...')
     gp = train_df[['ip', 'wday', 'in_test_hh']].groupby(by=['ip', 'wday'])[['in_test_hh']].nunique().reset_index().rename(
         index=str, columns={'in_test_hh': 'ip_wday_unique_in_test_hh'})
     train_df = train_df.merge(gp, on=['ip', 'wday'], how='left')
     del gp
     gc.collect()
 
-    print('grouping by ip-app combination...')
+    print('grouping by ip-device-os combination...')
     gp = train_df[['ip', 'device', 'os', 'app']].groupby(by=['ip', 'device', 'os'])[
         ['app']].nunique().reset_index().rename(
         index=str, columns={'app': 'ip_device_os_unique_app'})
@@ -275,7 +275,7 @@ def DO(frm, to, fileno):
     del gp
     gc.collect()
 
-    print('grouping by ip-app combination...')
+    print('grouping by ip combination...')
     gp = train_df[['ip', 'device']].groupby(by=['ip'])[['device']].nunique().reset_index().rename(
         index=str, columns={'device': 'ip_unique_device'})
     train_df = train_df.merge(gp, on=['ip'], how='left')
@@ -296,14 +296,14 @@ def DO(frm, to, fileno):
     del gp
     gc.collect()
 
-    print('grouping by ip-app combination...')
+    print('grouping by ip-day combination...')
     gp = train_df[['ip', 'day', 'hour']].groupby(by=['ip', 'day'])[['hour']].nunique().reset_index().rename(
         index=str, columns={'hour': 'ip_day_unique_hour'})
     train_df = train_df.merge(gp, on=['ip', 'day'], how='left')
     del gp
     gc.collect()
 
-    print('grouping by ip-app combination...')
+    print('grouping by ip-wday combination...')
     gp = train_df[['ip', 'wday', 'hour']].groupby(by=['ip', 'wday'])[['hour']].nunique().reset_index().rename(
         index=str, columns={'hour': 'ip_wday_unique_hour'})
     train_df = train_df.merge(gp, on=['ip', 'wday'], how='left')
@@ -350,7 +350,7 @@ def DO(frm, to, fileno):
     del gp
     gc.collect()
 
-    print('grouping by ip combination...')
+    print('grouping by ip-device-os combination...')
     gp = train_df[['ip', 'device', 'os', 'app']].groupby(by=['ip', 'device', 'os'])[['app']].cumcount()
     train_df['ip_device_os_cum_app'] = gp.values
     del gp
