@@ -19,7 +19,7 @@ debug = 0
 
 nrows = 184903891 - 1
 nchunk = 40000000
-val_size = 2500000
+val_size = 4000000
 
 # frm = nrows - 75000000
 frm = 0
