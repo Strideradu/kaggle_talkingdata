@@ -14,8 +14,8 @@
       <file leaf-file-name="lgbm_train.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lgbm_train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-425">
-              <caret line="352" column="35" selection-start-line="352" selection-start-column="35" selection-end-line="352" selection-end-column="35" />
+            <state relative-caret-position="1666">
+              <caret line="345" lean-forward="true" selection-start-line="345" selection-end-line="345" />
               <folding>
                 <element signature="e#242#261#0" expanded="true" />
               </folding>
@@ -51,7 +51,7 @@
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths />
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="-10" />
     <option name="width" value="1935" />
     <option name="height" value="1095" />
@@ -61,6 +61,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -72,7 +73,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -143,6 +143,16 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/lgbm_train.py">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6868">
+          <caret line="404" column="91" lean-forward="true" selection-start-line="404" selection-start-column="91" selection-end-line="404" selection-end-column="91" />
+          <folding>
+            <element signature="e#242#261#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lgbm_train.py">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5899">
           <caret line="353" column="4" selection-start-line="353" selection-start-column="4" selection-end-line="353" selection-end-column="4" />
           <folding>
@@ -163,8 +173,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lgbm_train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-425">
-          <caret line="352" column="35" selection-start-line="352" selection-start-column="35" selection-end-line="352" selection-end-column="35" />
+        <state relative-caret-position="1666">
+          <caret line="345" lean-forward="true" selection-start-line="345" selection-end-line="345" />
           <folding>
             <element signature="e#242#261#0" expanded="true" />
           </folding>

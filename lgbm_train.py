@@ -219,6 +219,8 @@ def DO(frm, to, fileno):
             print('saving')
             pd.DataFrame(QQ).to_csv(filename, index=False)
 
+    # also add prev click?
+
     train_df[new_feature] = QQ
     predictors.append(new_feature)
 
@@ -260,18 +262,19 @@ def DO(frm, to, fileno):
 
     # unique count
 
-    print('grouping by ip-wday combination...')
-    gp = train_df[['ip', 'wday', 'in_test_hh']].groupby(by=['ip', 'wday'])[['in_test_hh']].nunique().reset_index().rename(
-        index=str, columns={'in_test_hh': 'ip_wday_unique_in_test_hh'})
-    train_df = train_df.merge(gp, on=['ip', 'wday'], how='left')
+    # chennel
+
+    print('grouping by ip-app-os combination...')
+    gp = train_df[['app', 'channel']].groupby(by=['app'])[
+        ['channel']].count().reset_index().rename(index=str, columns={'channel': 'app_count'})
+    train_df = train_df.merge(gp, on=['app'], how='left')
     del gp
     gc.collect()
 
-    print('grouping by ip-device-os combination...')
-    gp = train_df[['ip', 'device', 'os', 'app']].groupby(by=['ip', 'device', 'os'])[
-        ['app']].nunique().reset_index().rename(
-        index=str, columns={'app': 'ip_device_os_unique_app'})
-    train_df = train_df.merge(gp, on=['ip', 'device', 'os'], how='left')
+    print('grouping by ip-app-os combination...')
+    gp = train_df[['os', 'app', 'channel']].groupby(by=['os', 'app'])[
+        ['channel']].count().reset_index().rename(index=str, columns={'channel': 'os_app_count'})
+    train_df = train_df.merge(gp, on=['os', 'app'], how='left')
     del gp
     gc.collect()
 
@@ -282,6 +285,13 @@ def DO(frm, to, fileno):
     del gp
     gc.collect()
 
+    print('grouping by os combination...')
+    gp = train_df[['os', 'device']].groupby(by=['os'])[['device']].nunique().reset_index().rename(
+        index=str, columns={'device': 'os_unique_device'})
+    train_df = train_df.merge(gp, on=['os'], how='left')
+    del gp
+    gc.collect()
+
     print('grouping by ip combination...')
     gp = train_df[['ip', 'app']].groupby(by=['ip'])[['app']].nunique().reset_index().rename(
         index=str, columns={'app': 'ip_unique_app'})
@@ -289,10 +299,37 @@ def DO(frm, to, fileno):
     del gp
     gc.collect()
 
+
+    print('grouping by ip-device-os combination...')
+    gp = train_df[['ip', 'device', 'os', 'app']].groupby(by=['ip', 'device', 'os'])[
+        ['app']].nunique().reset_index().rename(
+        index=str, columns={'app': 'ip_device_os_unique_app'})
+    train_df = train_df.merge(gp, on=['ip', 'device', 'os'], how='left')
+    del gp
+    gc.collect()
+
+
+    print('grouping by wday-hour combination...')
+    gp = train_df[['wday', 'hour', 'app']].groupby(by=['wday', 'hour'])[
+        ['app']].nunique().reset_index().rename(
+        index=str, columns={'app': 'wday_hour_unique_app'})
+    train_df = train_df.merge(gp, on=['wday', 'hour'], how='left')
+    del gp
+    gc.collect()
+
+
     print('grouping by ip-app combination...')
     gp = train_df[['ip', 'app', 'os']].groupby(by=['ip', 'app'])[['os']].nunique().reset_index().rename(
         index=str, columns={'os': 'ip_app_unique_os'})
     train_df = train_df.merge(gp, on=['ip', 'app'], how='left')
+    del gp
+    gc.collect()
+
+    print('grouping by ip-wday combination...')
+    gp = train_df[['ip', 'wday', 'in_test_hh']].groupby(by=['ip', 'wday'])[
+        ['in_test_hh']].nunique().reset_index().rename(
+        index=str, columns={'in_test_hh': 'ip_wday_unique_in_test_hh'})
+    train_df = train_df.merge(gp, on=['ip', 'wday'], how='left')
     del gp
     gc.collect()
 
@@ -310,7 +347,30 @@ def DO(frm, to, fileno):
     del gp
     gc.collect()
 
-    # channel groupby app
+    print('grouping by ip-os-wday combination...')
+    gp = train_df[['ip', 'os', 'wday', 'hour']].groupby(by=['ip', 'os', 'wday'])[
+        ['hour']].nunique().reset_index().rename(
+        index=str, columns={'hour': 'ip_os_wday_unique_hour'})
+    train_df = train_df.merge(gp, on=['ip', 'os', 'wday'], how='left')
+    del gp
+    gc.collect()
+
+    print('grouping by ip-app-wday combination...')
+    gp = train_df[['ip', 'app', 'wday', 'hour']].groupby(by=['ip', 'app', 'wday'])[
+        ['hour']].nunique().reset_index().rename(
+        index=str, columns={'hour': 'ip_app_wday_unique_hour'})
+    train_df = train_df.merge(gp, on=['ip', 'app', 'wday'], how='left')
+    del gp
+    gc.collect()
+
+    print('grouping by ip-device-wday combination...')
+    gp = train_df[['ip', 'device', 'wday', 'hour']].groupby(by=['ip', 'device', 'wday'])[
+        ['hour']].nunique().reset_index().rename(
+        index=str, columns={'hour': 'ip_device_wday_unique_hour'})
+    train_df = train_df.merge(gp, on=['ip', 'device', 'wday'], how='left')
+    del gp
+    gc.collect()
+
 
     # Adding features with var and mean hour (inspired from nuhsikander's script)
     print('grouping by : ip_day_chl_var_hour')
@@ -369,7 +429,9 @@ def DO(frm, to, fileno):
                        'ip_app_channel_var_day', 'ip_app_channel_mean_hour',
                        'in_test_hh', 'ip_wday_unique_in_test_hh', 'ip_device_os_unique_app', 'ip_unique_device',
                        'ip_unique_app', 'ip_app_unique_os', 'ip_day_unique_hour',
-                       'ip_cum_os', 'ip_device_os_cum_app', 'ip_wday_unique_hour'
+                       'ip_cum_os', 'ip_device_os_cum_app', 'ip_wday_unique_hour',
+                       'ip_os_wday_unique_hour', 'ip_app_wday_unique_hour', 'ip_device_wday_unique_hour',
+                       'os_app_count', 'app_count', 'os_unique_device', 'wday_hour_unique_app'
                        ])
     categorical = ['app', 'device', 'os', 'channel', 'hour', 'day']
     for i in range(0, naddfeat):
@@ -433,7 +495,7 @@ def DO(frm, to, fileno):
     print('Plot feature importances...')
     ax = lgb.plot_importance(bst, max_num_features=100)
     plt.savefig("result.png")
-    
+
     return sub
 
 
