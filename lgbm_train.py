@@ -10,6 +10,8 @@ from sklearn.cross_validation import train_test_split
 import lightgbm as lgb
 import gc
 import matplotlib
+import argparse
+import sys
 
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
@@ -37,7 +39,7 @@ if debug:
 
 def lgb_modelfit_nocv(params, dtrain, dvalid, predictors, target='target', objective='binary', metrics='auc',
                       feval=None, early_stopping_rounds=20, num_boost_round=3000, verbose_eval=10,
-                      categorical_features=None):
+                      categorical_features=None, test = None):
     lgb_params = {
         'boosting_type': 'gbdt',
         'objective': objective,
@@ -69,31 +71,41 @@ def lgb_modelfit_nocv(params, dtrain, dvalid, predictors, target='target', objec
                           feature_name=predictors,
                           categorical_feature=categorical_features
                           )
-    xgvalid = lgb.Dataset(dvalid[predictors].values, label=dvalid[target].values,
-                          feature_name=predictors,
-                          categorical_feature=categorical_features
-                          )
-
-    evals_results = {}
-
-    bst1 = lgb.train(lgb_params,
-                     xgtrain,
-                     valid_sets=[xgtrain, xgvalid],
-                     valid_names=['train', 'valid'],
-                     evals_result=evals_results,
-                     num_boost_round=num_boost_round,
-                     early_stopping_rounds=early_stopping_rounds,
-                     verbose_eval=10,
-                     feval=feval)
-
-    print("\nModel Report")
-    print("bst1.best_iteration: ", bst1.best_iteration)
-    print(metrics + ":", evals_results['valid'][metrics][bst1.best_iteration - 1])
-
-    return (bst1, bst1.best_iteration)
 
 
-def DO(frm, to, fileno):
+
+
+    if test:
+        bst1 = lgb.train(lgb_params,
+                         xgtrain,
+                         num_boost_round=test,
+                         verbose_eval=10,
+                         feval=feval)
+        return bst1, test
+    else:
+        evals_results = {}
+        xgvalid = lgb.Dataset(dvalid[predictors].values, label=dvalid[target].values,
+                              feature_name=predictors,
+                              categorical_feature=categorical_features
+                              )
+        bst1 = lgb.train(lgb_params,
+                         xgtrain,
+                         valid_sets=[xgtrain, xgvalid],
+                         valid_names=['train', 'valid'],
+                         evals_result=evals_results,
+                         num_boost_round=num_boost_round,
+                         early_stopping_rounds=early_stopping_rounds,
+                         verbose_eval=10,
+                         feval=feval)
+
+        print("\nModel Report")
+        print("bst1.best_iteration: ", bst1.best_iteration)
+        print(metrics + ":", evals_results['valid'][metrics][bst1.best_iteration - 1])
+
+        return (bst1, bst1.best_iteration)
+
+
+def DO(frm, to, fileno, test = None):
     dtypes = {
         'ip': 'uint32',
         'app': 'uint16',
@@ -105,26 +117,31 @@ def DO(frm, to, fileno):
     }
 
     print('loading train data...', frm, to)
-    train_df = pd.read_csv("/mnt/home/dunan/Learn/Kaggle/talkingdata_fraud/train.csv", parse_dates=['click_time'],
-                           skiprows=range(1, frm), nrows=to - frm,
-                           dtype=dtypes,
-                           usecols=['ip', 'app', 'device', 'os', 'channel', 'click_time', 'is_attributed'])
+    if test:
+        # use 8, 9 prdict test
+        train_df = pd.read_csv("/mnt/home/dunan/Learn/Kaggle/talkingdata_fraud/train.csv", parse_dates=['click_time'],
+                               skiprows=range(1, 68941879), nrows=to - 68941879,
+                               dtype=dtypes,
+                               usecols=['ip', 'app', 'device', 'os', 'channel', 'click_time', 'is_attributed'])
 
-    print('loading test data...')
-    if debug:
-        test_df = pd.read_csv("/mnt/home/dunan/Learn/Kaggle/talkingdata_fraud/test.csv", nrows=100000,
-                              parse_dates=['click_time'], dtype=dtypes,
-                              usecols=['ip', 'app', 'device', 'os', 'channel', 'click_time', 'click_id'])
-    else:
+        print('loading test data...')
         test_df = pd.read_csv("/mnt/home/dunan/Learn/Kaggle/talkingdata_fraud/test.csv", parse_dates=['click_time'],
                               dtype=dtypes,
                               usecols=['ip', 'app', 'device', 'os', 'channel', 'click_time', 'click_id'])
 
-    len_train = len(train_df)
-    train_df = train_df.append(test_df)
+        len_train = len(train_df)
+        train_df = train_df.append(test_df)
 
-    del test_df
-    gc.collect()
+        del test_df
+        gc.collect()
+    else:
+        # use 7.8 to predict on 9
+        train_df = pd.read_csv("/mnt/home/dunan/Learn/Kaggle/talkingdata_fraud/train.csv", parse_dates=['click_time'],
+                               skiprows=range(1, 9308569), nrows=to - 9308569,
+                               dtype=dtypes,
+                               usecols=['ip', 'app', 'device', 'os', 'channel', 'click_time', 'is_attributed'])
+
+
 
     print('Extracting new features...')
     train_df['hour'] = pd.to_datetime(train_df.click_time).dt.hour.astype('uint8')
@@ -439,16 +456,22 @@ def DO(frm, to, fileno):
 
     print('predictors', predictors)
 
-    test_df = train_df[len_train:]
-    val_df = train_df[(len_train - val_size):len_train]
-    train_df = train_df[:(len_train - val_size)]
+    if test:
+        test_df = train_df[len_train:]
+        train_df = train_df[:len_train ]
+        val_df = None
+    else:
+        test_df = None
+        val_size = to - 131886954
+        val_df = train_df[(len_train - val_size):len_train]
+        train_df = train_df[:(len_train - val_size)]
+
 
     print("train size: ", len(train_df))
-    print("valid size: ", len(val_df))
-    print("test size : ", len(test_df))
 
-    sub = pd.DataFrame()
-    sub['click_id'] = test_df['click_id'].astype('int')
+    if test:
+        sub = pd.DataFrame()
+        sub['click_id'] = test_df['click_id'].astype('int')
 
     gc.collect()
 
@@ -468,6 +491,7 @@ def DO(frm, to, fileno):
         'min_child_weight': 0,  # Minimum sum of instance weight(hessian) needed in a child(leaf)
         'scale_pos_weight': 200  # because training data is extremely unbalanced
     }
+
     (bst, best_iteration) = lgb_modelfit_nocv(params,
                                               train_df,
                                               val_df,
@@ -478,26 +502,38 @@ def DO(frm, to, fileno):
                                               early_stopping_rounds=30,
                                               verbose_eval=True,
                                               num_boost_round=1000,
-                                              categorical_features=categorical)
+                                              categorical_features=categorical,
+                                              test = test)
 
     print('[{}]: model training time'.format(time.time() - start_time))
     del train_df
     del val_df
     gc.collect()
 
-    print("Predicting...")
-    sub['is_attributed'] = bst.predict(test_df[predictors], num_iteration=best_iteration)
-    if not debug:
-        print("writing...")
-        sub.to_csv('sub_it%d.csv.gz' % (fileno), index=False, compression='gzip')
-    print("done...")
+    if test:
+        print("Predicting...")
+        sub['is_attributed'] = bst.predict(test_df[predictors], num_iteration=best_iteration)
+        if not debug:
+            print("writing...")
+            sub.to_csv('sub_it%d.csv.gz' % (fileno), index=False, compression='gzip')
+        print("done...")
 
-    print('Plot feature importances...')
-    ax = lgb.plot_importance(bst, max_num_features=100)
-    plt.savefig("result.png")
+        return sub
+    else:
+        print('Plot feature importances...')
+        ax = lgb.plot_importance(bst, max_num_features=100)
+        plt.savefig("result.png")
 
-    return sub
+        return 0
 
 
 if __name__ == '__main__':
-    sub = DO(frm, to, 0)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--test", help="best of num of epoches", type=int, default=None)
+    try:
+        args = parser.parse_args()
+
+    except:
+        parser.print_help()
+        sys.exit(1)
+    sub = DO(frm, to, 0, test=args.test)
