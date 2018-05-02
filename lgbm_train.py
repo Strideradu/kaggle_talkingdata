@@ -130,16 +130,18 @@ def DO(frm, to, fileno, test = None):
                               usecols=['ip', 'app', 'device', 'os', 'channel', 'click_time', 'click_id'])
 
         len_train = len(train_df)
+        len_test = len(test_df)
         train_df = train_df.append(test_df)
 
         del test_df
         gc.collect()
     else:
-        # use 7.8 to predict on 9
+        # use 7, 8 to predict on 9
         train_df = pd.read_csv("/mnt/home/dunan/Learn/Kaggle/talkingdata_fraud/train.csv", parse_dates=['click_time'],
                                skiprows=range(1, 9308569), nrows=to - 9308569,
                                dtype=dtypes,
                                usecols=['ip', 'app', 'device', 'os', 'channel', 'click_time', 'is_attributed'])
+        len_train = len(train_df)
 
 
 
@@ -216,7 +218,10 @@ def DO(frm, to, fileno, test = None):
 
     if os.path.exists(filename):
         print('loading from save file')
-        QQ = pd.read_csv(filename).values
+        if test:
+            QQ = pd.read_csv(filename)[68941879:].values
+        else:
+            QQ = pd.read_csv(filename)[9308569:9808569 + len_train].values
     else:
         D = 2 ** 26
         train_df['category'] = (train_df['ip'].astype(str) + "_" + train_df['app'].astype(str) + "_" + train_df[
