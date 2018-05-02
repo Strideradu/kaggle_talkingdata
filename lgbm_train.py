@@ -221,7 +221,7 @@ def DO(frm, to, fileno, test = None):
         if test:
             QQ = pd.read_csv(filename)[68941879:].values
         else:
-            QQ = pd.read_csv(filename)[9308569:9808569 + len_train].values
+            QQ = pd.read_csv(filename)[9308569:9308569 + len_train].values
     else:
         D = 2 ** 26
         train_df['category'] = (train_df['ip'].astype(str) + "_" + train_df['app'].astype(str) + "_" + train_df[
