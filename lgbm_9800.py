@@ -7,7 +7,7 @@
 
 import os
 
-print(os.listdir("../input"))
+# print(os.listdir("../input"))
 
 FILENO = 23  # To distinguish the output file name3
 debug = 0  # Whethere or not in debuging mode
