@@ -81,6 +81,8 @@ def lgb_modelfit_nocv(params, dtrain, dvalid, predictors, target='target', objec
                          num_boost_round=test,
                          verbose_eval=10,
                          feval=feval)
+        print("\nModel Report")
+        print("bst1.best_iteration: ", bst1.best_iteration)
         return bst1, test
     else:
         evals_results = {}
@@ -517,7 +519,9 @@ def DO(frm, to, fileno, test = None):
 
     if test:
         print("Predicting...")
-        sub['is_attributed'] = bst.predict(test_df[predictors], num_iteration=best_iteration)
+        sub['is_attributed'] = bst.predict(test_df[predictors],
+                                           #num_iteration=best_iteration
+                                           )
         if not debug:
             print("writing...")
             sub.to_csv('sub_it%d.csv.gz' % (fileno), index=False, compression='gzip')
