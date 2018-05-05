@@ -374,7 +374,7 @@ def DO(frm, to, fileno):
     sub['is_attributed'] = bst.predict(test_df[predictors], num_iteration=best_iteration)
     #     if not debug:
     #         print("writing...")
-    sub.to_csv('sub_it%d.csv' % (fileno), index=False, float_format='%.9f')
+    sub.to_csv('sub_2nd_it%d.csv' % (fileno), index=False, float_format='%.9f')
     print("done...")
     return sub
 
