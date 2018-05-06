@@ -92,8 +92,8 @@ def lgb_modelfit_nocv(params, dtrain, dvalid, predictors, target='target', objec
                               )
         bst1 = lgb.train(lgb_params,
                          xgtrain,
-                         valid_sets=[xgtrain, xgvalid],
-                         valid_names=['train', 'valid'],
+                         valid_sets=[xgvalid],
+                         valid_names=['valid'],
                          evals_result=evals_results,
                          num_boost_round=num_boost_round,
                          early_stopping_rounds=early_stopping_rounds,
