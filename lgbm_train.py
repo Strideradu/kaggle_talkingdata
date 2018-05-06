@@ -44,7 +44,7 @@ def lgb_modelfit_nocv(params, dtrain, dvalid, predictors, target='target', objec
         'boosting_type': 'gbdt',
         'objective': objective,
         'metric': metrics,
-        'learning_rate': 0.2,
+        'learning_rate': 0.05,
         # 'is_unbalance': 'true',  #because training data is unbalance (replaced with scale_pos_weight)
         'num_leaves': 31,  # we should let it be smaller than 2^(max_depth)
         'max_depth': -1,  # -1 means no limit
