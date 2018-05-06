@@ -189,7 +189,7 @@ def lgb_modelfit_nocv(params, dtrain, dvalid, predictors, target='target', objec
         'learning_rate': 0.03,
         # 'is_unbalance': 'true',  #because training data is unbalance (replaced with scale_pos_weight)
         'num_leaves': 8,  # we should let it be smaller than 2^(max_depth)
-        'max_depth': 4,  # -1 means no limit
+        'max_depth': -1,  # -1 means no limit
         'min_child_samples': 20,  # Minimum number of data need in a child(min_data_in_leaf)
         'max_bin': 255,  # Number of bucketed bin for feature values
         'subsample': 0.6,  # Subsample ratio of the training instance.
