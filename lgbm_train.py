@@ -3,15 +3,15 @@ A non-blending lightGBM model that incorporates portions and ideas from various 
 This kernel gives LB: 0.977 when the parameter 'debug' below is set to 0 but this implementation requires a machine with ~32 GB of memory
 """
 
-import pandas as pd
-import time
-import numpy as np
-from sklearn.cross_validation import train_test_split
-import lightgbm as lgb
-import gc
-import matplotlib
 import argparse
+import gc
 import sys
+import time
+
+import lightgbm as lgb
+import matplotlib
+import numpy as np
+import pandas as pd
 
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
@@ -39,12 +39,12 @@ if debug:
 
 def lgb_modelfit_nocv(params, dtrain, dvalid, predictors, target='target', objective='binary', metrics='auc',
                       feval=None, early_stopping_rounds=20, num_boost_round=3000, verbose_eval=10,
-                      categorical_features=None, test = None):
+                      categorical_features=None, test=None):
     lgb_params = {
         'boosting_type': 'gbdt',
         'objective': objective,
         'metric': metrics,
-        'learning_rate': 0.05,
+        'learning_rate': 0.03,
         # 'is_unbalance': 'true',  #because training data is unbalance (replaced with scale_pos_weight)
         'num_leaves': 31,  # we should let it be smaller than 2^(max_depth)
         'max_depth': -1,  # -1 means no limit
@@ -71,9 +71,6 @@ def lgb_modelfit_nocv(params, dtrain, dvalid, predictors, target='target', objec
                           feature_name=predictors,
                           categorical_feature=categorical_features
                           )
-
-
-
 
     if test:
         bst1 = lgb.train(lgb_params,
@@ -107,7 +104,7 @@ def lgb_modelfit_nocv(params, dtrain, dvalid, predictors, target='target', objec
         return (bst1, bst1.best_iteration)
 
 
-def DO(frm, to, fileno, test = None):
+def DO(frm, to, fileno, test=None):
     dtypes = {
         'ip': 'uint32',
         'app': 'uint16',
@@ -144,8 +141,6 @@ def DO(frm, to, fileno, test = None):
                                dtype=dtypes,
                                usecols=['ip', 'app', 'device', 'os', 'channel', 'click_time', 'is_attributed'])
         len_train = len(train_df)
-
-
 
     print('Extracting new features...')
     train_df['hour'] = pd.to_datetime(train_df.click_time).dt.hour.astype('uint8')
@@ -323,7 +318,6 @@ def DO(frm, to, fileno, test = None):
     del gp
     gc.collect()
 
-
     print('grouping by ip-device-os combination...')
     gp = train_df[['ip', 'device', 'os', 'app']].groupby(by=['ip', 'device', 'os'])[
         ['app']].nunique().reset_index().rename(
@@ -332,7 +326,6 @@ def DO(frm, to, fileno, test = None):
     del gp
     gc.collect()
 
-
     print('grouping by wday-hour combination...')
     gp = train_df[['wday', 'hour', 'app']].groupby(by=['wday', 'hour'])[
         ['app']].nunique().reset_index().rename(
@@ -340,7 +333,6 @@ def DO(frm, to, fileno, test = None):
     train_df = train_df.merge(gp, on=['wday', 'hour'], how='left')
     del gp
     gc.collect()
-
 
     print('grouping by ip-app combination...')
     gp = train_df[['ip', 'app', 'os']].groupby(by=['ip', 'app'])[['os']].nunique().reset_index().rename(
@@ -394,7 +386,6 @@ def DO(frm, to, fileno, test = None):
     train_df = train_df.merge(gp, on=['ip', 'device', 'wday'], how='left')
     del gp
     gc.collect()
-
 
     # Adding features with var and mean hour (inspired from nuhsikander's script)
     print('grouping by : ip_day_chl_var_hour')
@@ -465,14 +456,13 @@ def DO(frm, to, fileno, test = None):
 
     if test:
         test_df = train_df[len_train:]
-        train_df = train_df[:len_train ]
+        train_df = train_df[:len_train]
         val_df = None
     else:
         test_df = None
         val_size = to - 131886954
         val_df = train_df[(len_train - val_size):len_train]
         train_df = train_df[:(len_train - val_size)]
-
 
     print("train size: ", len(train_df))
 
@@ -510,7 +500,7 @@ def DO(frm, to, fileno, test = None):
                                               verbose_eval=True,
                                               num_boost_round=1000,
                                               categorical_features=categorical,
-                                              test = test)
+                                              test=test)
 
     print('[{}]: model training time'.format(time.time() - start_time))
     del train_df
@@ -520,7 +510,7 @@ def DO(frm, to, fileno, test = None):
     if test:
         print("Predicting...")
         sub['is_attributed'] = bst.predict(test_df[predictors],
-                                           #num_iteration=best_iteration
+                                           # num_iteration=best_iteration
                                            )
         if not debug:
             print("writing...")
