@@ -70,7 +70,7 @@ sub_hm.head()
 
 sub_fin = pd.DataFrame()
 sub_fin['click_id'] = df1['click_id']
-sub_fin['is_attributed'] = (5.5 * isa_lg + 3 * isa_hm + 1.5 * isa_am) / 10
+sub_fin['is_attributed'] = (5 * df1['is_attributed'] + 3 * df2['is_attributed'] + 2 * df3['is_attributed']) / 10
 
 print("Writing...")
 # sub_log.to_csv('submission_log2.csv', index=False, float_format='%.9f')
