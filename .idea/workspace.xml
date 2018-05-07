@@ -23,13 +23,25 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="0p9811kernel.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="0p9811kernel.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/0p9811kernel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="320">
-              <caret line="459" column="14" selection-start-line="459" selection-start-column="14" selection-end-line="460" />
+            <state relative-caret-position="371">
+              <caret line="474" column="25" lean-forward="true" selection-start-line="474" selection-start-column="25" selection-end-line="475" />
               <folding>
                 <element signature="e#103#112#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="bagging.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/bagging.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="303">
+              <caret line="76" column="21" selection-start-line="76" selection-start-column="21" selection-end-line="76" selection-end-column="21" />
+              <folding>
+                <element signature="e#232#268#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -62,6 +74,7 @@
         <option value="$PROJECT_DIR$/lgbm_9800.py" />
         <option value="$PROJECT_DIR$/lgbm_train.py" />
         <option value="$PROJECT_DIR$/0p9811kernel.py" />
+        <option value="$PROJECT_DIR$/bagging.py" />
       </list>
     </option>
   </component>
@@ -263,10 +276,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/0p9811kernel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="459" column="14" selection-start-line="459" selection-start-column="14" selection-end-line="460" />
+        <state relative-caret-position="371">
+          <caret line="474" column="25" lean-forward="true" selection-start-line="474" selection-start-column="25" selection-end-line="475" />
           <folding>
             <element signature="e#103#112#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/bagging.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="303">
+          <caret line="76" column="21" selection-start-line="76" selection-start-column="21" selection-end-line="76" selection-end-column="21" />
+          <folding>
+            <element signature="e#232#268#0" expanded="true" />
           </folding>
         </state>
       </provider>
