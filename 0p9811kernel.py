@@ -458,3 +458,20 @@ def DO(frm, to, fileno):
     sub.to_csv(path + 'sub_it%d.csv' % (fileno), index=False, float_format='%.9f')
     print("done...")
     return sub
+
+if __name__ == '__main__':
+    nrows = 184903891 - 1
+    nchunk = 25000000
+    # val_size=2500000
+    val_size = 5000000
+
+    # frm=nrows-65000000
+    frm = 0
+    to = nrows
+    if debug:
+        frm = 0
+        nchunk = 100000
+        val_size = 10000
+        to = frm + nchunk
+
+    sub = DO(frm, to, FILENO)
